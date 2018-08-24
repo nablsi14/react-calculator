@@ -8,9 +8,8 @@ import StyledButton from './StyledButton'
 
 const styles = () =>
     createStyles({
-        grid: {
-            border: '1px solid black',
-            maxWidth: '400px'
+        calculatorContainer: {
+            width: 400
         }
     })
 interface Props {
@@ -33,53 +32,58 @@ class CalculatorBase extends PureComponent<
     }
 
     public render(): React.ReactNode {
+        const { classes } = this.props
         return (
-            <Grid
-                container={true}
-                className={this.props.classes.grid}
-                justify="center"
-                spacing={8}
-                direction="row"
-            >
-                <Grid item={true} xs={12}>
-                    <OutputDisplay value={this.state.accumulator} />
-                </Grid>
-                <Grid item={true} xs={8}>
-                    <Grid container={true} spacing={8} wrap="wrap">
-                        {...this.createNumberButtons()}
-                        <Grid item={true} xs={4}>
-                            <StyledButton
-                                onClick={this.evaluate}
-                                color="primary"
-                            >
-                                =
-                            </StyledButton>
-                        </Grid>
-                        <Grid item={true} xs={4}>
-                            <StyledButton
-                                onClick={this.clear}
-                                color="secondary"
-                            >
-                                C
-                            </StyledButton>
-                        </Grid>
+            <div>
+                <Grid
+                    container={true}
+                    className={classes.calculatorContainer}
+                    spacing={8}
+                >
+                    <Grid item={true} xs={12}>
+                        <OutputDisplay value={this.state.accumulator} />
                     </Grid>
-                </Grid>
-                <Grid item={true} xs={4}>
-                    <Grid container={true} spacing={8} direction="column">
+                    {/* buttons will be added here later */}
+                    {/* <Grid item={true} xs={12} /> */}
+                    <Grid
+                        item={true}
+                        xs={9}
+                        sm={true}
+                        container={true}
+                        spacing={8}
+                    >
+                        <Grid item={true} xs={4}>
+                            <StyledButton onClick={this.clear}>C</StyledButton>
+                        </Grid>
+                        {...this.createNumberButtons()}
+                    </Grid>
+                    <Grid
+                        item={true}
+                        xs={3}
+                        direction="column"
+                        container={true}
+                        spacing={8}
+                    >
                         {this.props.operations.map(op => (
-                            <Grid item={true} xs={4} key={op.text}>
+                            <Grid item={true}>
                                 <OpertionButton
+                                    key={op.text}
                                     operation={op}
                                     onClick={this.handleOperationClick}
                                 />
                             </Grid>
                         ))}
+                        <Grid item={true}>
+                            <StyledButton onClick={this.evaluate}>
+                                =
+                            </StyledButton>
+                        </Grid>
                     </Grid>
                 </Grid>
-            </Grid>
+            </div>
         )
     }
+
     private readonly clear = (): void => {
         this.setState({
             accumulator: 0,
@@ -87,6 +91,7 @@ class CalculatorBase extends PureComponent<
             operation: null
         })
     }
+
     private readonly createNumberButtons = (): JSX.Element[] => {
         const result: JSX.Element[] = []
 
@@ -100,6 +105,7 @@ class CalculatorBase extends PureComponent<
 
         return result
     }
+
     private readonly evaluate = (): void => {
         if (this.state.operation) {
             const { accumulator, operand, operation } = this.state
@@ -111,11 +117,13 @@ class CalculatorBase extends PureComponent<
             })
         }
     }
+
     private readonly handleClick = (input: number): void => {
         this.setState(prev => ({
             accumulator: prev.accumulator * 10 + input
         }))
     }
+
     private readonly handleOperationClick = (operation: Operation): void => {
         this.setState(prev => ({
             accumulator: 0,

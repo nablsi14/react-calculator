@@ -10,15 +10,12 @@ import {
 
 const styles = (theme: Theme) =>
     createStyles({
-        button: {
-            margin: 0,
-            width: '100%'
-        }
+        button: {}
     })
 interface Props {
     children: any
     color?: 'primary' | 'secondary'
-    onClick: (e: any) => void
+    onClick?: (e: any) => void
 }
 const StyledButton = (props: Props & WithStyles<typeof styles>) => (
     <Button
@@ -26,6 +23,7 @@ const StyledButton = (props: Props & WithStyles<typeof styles>) => (
         onClick={props.onClick}
         className={props.classes.button}
         color={props.color || 'default'}
+        fullWidth={true}
     >
         {props.children}
     </Button>
