@@ -53,6 +53,11 @@ class CalculatorBase extends PureComponent<
                         spacing={8}
                     >
                         <Grid item={true} xs={4}>
+                            <StyledButton onClick={this.clearEntry}>
+                                CE
+                            </StyledButton>
+                        </Grid>
+                        <Grid item={true} xs={4}>
                             <StyledButton onClick={this.clear}>C</StyledButton>
                         </Grid>
                         {...this.createNumberButtons()}
@@ -91,7 +96,11 @@ class CalculatorBase extends PureComponent<
             operation: null
         })
     }
-
+    private readonly clearEntry = (): void => {
+        this.setState({
+            accumulator: 0
+        })
+    }
     private readonly createNumberButtons = (): JSX.Element[] => {
         const result: JSX.Element[] = []
 
