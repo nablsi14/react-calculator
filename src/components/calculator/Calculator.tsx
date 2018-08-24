@@ -1,4 +1,5 @@
 import { createStyles, Grid, WithStyles, withStyles } from '@material-ui/core'
+import BackspaceOutlined from '@material-ui/icons/BackspaceOutlined'
 import React, { PureComponent } from 'react'
 import NumberButton from './InputButton'
 import OpertionButton from './OperationButton'
@@ -60,6 +61,11 @@ class CalculatorBase extends PureComponent<
                         <Grid item={true} xs={4}>
                             <StyledButton onClick={this.clear}>C</StyledButton>
                         </Grid>
+                        <Grid item={true} xs={4}>
+                            <StyledButton onClick={this.clearLast}>
+                                <BackspaceOutlined />
+                            </StyledButton>
+                        </Grid>
                         {...this.createNumberButtons()}
                     </Grid>
                     <Grid
@@ -96,9 +102,19 @@ class CalculatorBase extends PureComponent<
             operation: null
         })
     }
+
     private readonly clearEntry = (): void => {
         this.setState({
             accumulator: 0
+        })
+    }
+
+    private readonly clearLast = (): void => {
+        this.setState(prev => {
+            const num = prev.accumulator.toString()
+            return {
+                accumulator: Number(num.substring(0, num.length - 1))
+            }
         })
     }
     private readonly createNumberButtons = (): JSX.Element[] => {
