@@ -1,23 +1,49 @@
-import { CssBaseline, Grid } from '@material-ui/core'
+import {
+    AppBar,
+    createStyles,
+    CssBaseline,
+    Grid,
+    Theme,
+    Toolbar,
+    Typography,
+    withStyles,
+    WithStyles
+} from '@material-ui/core'
 import React, { Fragment } from 'react'
 import Calculator from './calculator/Calculator'
 import { standard } from './calculator/Operations'
 
-const App = () => (
+const styles = (theme: Theme) =>
+    createStyles({
+        root: {
+            flexGrow: 1
+        }
+    })
+
+const App = (props: {} & WithStyles<typeof styles>) => (
     <Fragment>
         <CssBaseline />
-        <Grid
-            container={true}
-            spacing={0}
-            direction="column"
-            alignItems="center"
-            justify="center"
-        >
-            <Grid item={true} xs={12}>
-                <Calculator operations={standard} />
+        <div className={props.classes.root}>
+            <AppBar position="static" color="default">
+                <Toolbar>
+                    <Typography variant="title" color="inherit" align="center">
+                        Calculator
+                    </Typography>
+                </Toolbar>
+            </AppBar>
+            <Grid
+                container={true}
+                spacing={0}
+                direction="column"
+                alignItems="center"
+                justify="center"
+            >
+                <Grid item={true} xs={12}>
+                    <Calculator operations={standard} />
+                </Grid>
             </Grid>
-        </Grid>
+        </div>
     </Fragment>
 )
 
-export default App
+export default withStyles(styles)(App)
