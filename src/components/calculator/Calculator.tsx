@@ -67,6 +67,18 @@ class CalculatorBase extends PureComponent<
                             </StyledButton>
                         </Grid>
                         {...this.createNumberButtons()}
+                        <Grid item={true} xs={4}>
+                            <StyledButton onClick={this.toggleSign}>
+                                ± {/*  UTF-8 code: U+00B1  */}
+                            </StyledButton>
+                        </Grid>
+
+                        <Grid item={true} xs={4}>
+                            <NumberButton
+                                onClick={this.handleClick}
+                                value={0}
+                            />
+                        </Grid>
                     </Grid>
                     <Grid
                         item={true}
@@ -120,7 +132,7 @@ class CalculatorBase extends PureComponent<
     private readonly createNumberButtons = (): JSX.Element[] => {
         const result: JSX.Element[] = []
 
-        for (let i = 9; i >= 0; i--) {
+        for (let i = 9; i > 0; i--) {
             result.push(
                 <Grid item={true} xs={4} key={i}>
                     <NumberButton onClick={this.handleClick} value={i} />
@@ -143,10 +155,24 @@ class CalculatorBase extends PureComponent<
         }
     }
 
-    private readonly handleClick = (input: number): void => {
+    private readonly toggleSign = (): void => {
         this.setState(prev => ({
-            accumulator: prev.accumulator * 10 + input
+            accumulator: prev.accumulator * -1
         }))
+    }
+
+    private readonly handleClick = (input: number): void => {
+        this.setState(prev => {
+            if (prev.accumulator >= 0) {
+                return {
+                    accumulator: prev.accumulator * 10 + input
+                }
+            } else {
+                return {
+                    accumulator: prev.accumulator * 10 - input
+                }
+            }
+        })
     }
 
     private readonly handleOperationClick = (operation: Operation): void => {
