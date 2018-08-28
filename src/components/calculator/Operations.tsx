@@ -2,6 +2,7 @@ export type Parenthesis = '(' | ')'
 
 export type EvalFunc = (left: number, right: number) => number
 
+export type EvalStack = Array<number | Operation | Parenthesis>
 interface KeyboardShortcut {
     alt: boolean
     ctrl: boolean
