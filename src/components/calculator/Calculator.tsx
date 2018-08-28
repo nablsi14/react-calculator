@@ -3,7 +3,7 @@ import BackspaceOutlined from '@material-ui/icons/BackspaceOutlined'
 import React, { PureComponent } from 'react'
 import NumberButton from './InputButton'
 import OpertionButton from './OperationButton'
-import { Operation, Parenthesis } from './Operations'
+import { EvalStack, Operation, Parenthesis } from './Operations'
 import OutputDisplay from './OutputDisplay'
 import StyledButton from './StyledButton'
 
@@ -22,7 +22,7 @@ interface Props {
 }
 interface State {
     readonly current: string
-    readonly stack: Array<number | Operation | Parenthesis>
+    readonly stack: EvalStack
 }
 
 class CalculatorBase extends PureComponent<
@@ -206,9 +206,7 @@ class CalculatorBase extends PureComponent<
         return tempStack[0]
     }
 
-    private readonly infixToPostfix = (
-        input: Array<number | Operation | Parenthesis>
-    ): PostfixStack => {
+    private readonly infixToPostfix = (input: EvalStack): PostfixStack => {
         const result: PostfixStack = []
         const operators: Array<Operation | Parenthesis> = []
 
