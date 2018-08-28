@@ -11,6 +11,9 @@ const styles = () =>
     createStyles({
         calculatorContainer: {
             width: 400
+        },
+        decimalButton: {
+            fontSize: '2em'
         }
     })
 interface Props {
@@ -76,6 +79,11 @@ class CalculatorBase extends PureComponent<
                                 onClick={this.handleNumberInput}
                                 value={0}
                             />
+                        </Grid>
+                        <Grid item={true} xs={4}>
+                            <StyledButton onClick={this.setDecimalPoint}>
+                                <span className={classes.decimalButton}>.</span>
+                            </StyledButton>
                         </Grid>
                     </Grid>
                     <Grid
@@ -236,6 +244,16 @@ class CalculatorBase extends PureComponent<
 
         return result
     }
+
+    private readonly setDecimalPoint = (): void => {
+        // prevent multiple '.' from being in a number
+        if (!this.state.current.includes('.')) {
+            this.setState(prev => ({
+                current: prev.current + (prev.current === '' ? '0.' : '.')
+            }))
+        }
+    }
+
     private readonly toggleSign = (): void => {
         this.setState(prev => {
             if (prev.current.charAt(0) === '-') {
