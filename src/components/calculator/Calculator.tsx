@@ -3,7 +3,7 @@ import BackspaceOutlined from '@material-ui/icons/BackspaceOutlined'
 import React, { PureComponent } from 'react'
 import NumberButton from './InputButton'
 import OpertionButton from './OperationButton'
-import { Operation } from './Operations'
+import { Operation, Parenthesis } from './Operations'
 import OutputDisplay from './OutputDisplay'
 import StyledButton from './StyledButton'
 
@@ -17,9 +17,8 @@ interface Props {
     operations: Operation[]
 }
 interface State {
-    readonly accumulator: number
-    readonly operand: number
-    readonly operation: Operation | null
+    readonly current: string
+    readonly stack: Array<number | Operation | Parenthesis>
 }
 
 class CalculatorBase extends PureComponent<
@@ -27,9 +26,8 @@ class CalculatorBase extends PureComponent<
     State
 > {
     public readonly state: State = {
-        accumulator: 0,
-        operand: 0,
-        operation: null
+        current: '',
+        stack: []
     }
 
     public render(): React.ReactNode {
@@ -42,7 +40,7 @@ class CalculatorBase extends PureComponent<
                     spacing={8}
                 >
                     <Grid item={true} xs={12}>
-                        <OutputDisplay value={this.state.accumulator} />
+                        <OutputDisplay value={Number(this.state.current)} />
                     </Grid>
                     {/* buttons will be added here later */}
                     {/* <Grid item={true} xs={12} /> */}
@@ -75,7 +73,7 @@ class CalculatorBase extends PureComponent<
 
                         <Grid item={true} xs={4}>
                             <NumberButton
-                                onClick={this.handleClick}
+                                onClick={this.handleNumberInput}
                                 value={0}
                             />
                         </Grid>
@@ -109,25 +107,35 @@ class CalculatorBase extends PureComponent<
 
     private readonly clear = (): void => {
         this.setState({
-            accumulator: 0,
-            operand: 0,
-            operation: null
+            current: '',
+            stack: []
         })
     }
 
     private readonly clearEntry = (): void => {
         this.setState({
-            accumulator: 0
+            current: ''
         })
     }
 
     private readonly clearLast = (): void => {
-        this.setState(prev => {
-            const num = prev.accumulator.toString()
-            return {
-                accumulator: Number(num.substring(0, num.length - 1))
-            }
-        })
+        // the last thing to have been clicked was an operation
+        if (this.state.current === '') {
+            this.setState(prev => ({
+                // set curret to be the last number that was inputed
+                current: String(prev.stack[prev.stack.length - 2]),
+                // remove the last 2 items from the stack
+                stack: prev.stack.slice(0, prev.stack.length - 2)
+            }))
+        } else {
+            // the last thing to have been clicked was a digit
+            this.setState(prev => {
+                return {
+                    // slice the last character from the string
+                    current: prev.current.slice(0, prev.current.length - 1)
+                }
+            })
+        }
     }
     private readonly createNumberButtons = (): JSX.Element[] => {
         const result: JSX.Element[] = []
@@ -135,7 +143,7 @@ class CalculatorBase extends PureComponent<
         for (let i = 9; i > 0; i--) {
             result.push(
                 <Grid item={true} xs={4} key={i}>
-                    <NumberButton onClick={this.handleClick} value={i} />
+                    <NumberButton onClick={this.handleNumberInput} value={i} />
                 </Grid>
             )
         }
@@ -144,42 +152,115 @@ class CalculatorBase extends PureComponent<
     }
 
     private readonly evaluate = (): void => {
-        if (this.state.operation) {
-            const { accumulator, operand, operation } = this.state
-            const result = operation.evaluate(accumulator, operand)
+        try {
+            const postfixStack = this.infixToPostfix([
+                ...this.state.stack,
+                Number(this.state.current)
+            ])
+            const result = this.evalPostfix(postfixStack)
             this.setState({
-                accumulator: result,
-                operand: 0,
-                operation: null
+                current: String(result),
+                stack: []
             })
+        } catch (e) {
+            // the stack was invalid
+            // this is most likely caused by the user pressing the "=" button before finishing the expression
+            // because of this, we are simply going to do nothing and wait for the user to finish the expression
+            // tslint:disable-next-line:no-console
+            console.log(e.message)
         }
     }
 
-    private readonly toggleSign = (): void => {
-        this.setState(prev => ({
-            accumulator: prev.accumulator * -1
-        }))
+    private readonly evalPostfix = (
+        postfixStack: Array<number | Operation>
+    ): number => {
+        const tempStack: number[] = []
+        for (const item of postfixStack) {
+            if (typeof item === 'number') {
+                tempStack.push(item)
+            } else {
+                const num1 = tempStack.pop()
+                const num2 = tempStack.pop()
+                if (num1 !== undefined && num2 !== undefined) {
+                    tempStack.push(item.evaluate(num1, num2))
+                } else {
+                    throw new Error('Invalid postfix stack')
+                }
+            }
+        }
+        return tempStack[0]
     }
 
-    private readonly handleClick = (input: number): void => {
+    private readonly infixToPostfix = (
+        input: Array<number | Operation | Parenthesis>
+    ): Array<number | Operation> => {
+        const result: Array<number | Operation> = []
+        const operators: Array<Operation | Parenthesis> = []
+
+        for (const item of input) {
+            if (typeof item === 'number') {
+                result.push(item)
+            } else if (item === '(') {
+                operators.push(item)
+            } else if (item === ')') {
+                while (
+                    operators.length !== 0 &&
+                    operators[operators.length - 1] !== ')'
+                ) {
+                    result.push(operators.pop() as Operation)
+                }
+                if (
+                    operators.length !== 0 &&
+                    operators[operators.length - 1] !== '('
+                ) {
+                    throw new Error('Invalid Expression')
+                } else {
+                    operators.pop()
+                }
+            } else {
+                // item must be an Operation
+                while (
+                    operators.length !== 0 &&
+                    item.precedence <=
+                        (operators[operators.length - 1] as Operation)
+                            .precedence
+                ) {
+                    result.push(operators.pop() as Operation)
+                }
+                operators.push(item)
+            }
+        }
+
+        while (operators.length !== 0) {
+            result.push(operators.pop() as Operation)
+        }
+
+        return result
+    }
+    private readonly toggleSign = (): void => {
         this.setState(prev => {
-            if (prev.accumulator >= 0) {
+            if (prev.current.charAt(0) === '-') {
                 return {
-                    accumulator: prev.accumulator * 10 + input
+                    current: prev.current.slice(1)
                 }
             } else {
                 return {
-                    accumulator: prev.accumulator * 10 - input
+                    current: '-' + prev.current
                 }
             }
         })
     }
 
+    private readonly handleNumberInput = (input: number): void => {
+        this.setState(prev => ({
+            current: prev.current + String(input)
+        }))
+    }
+
     private readonly handleOperationClick = (operation: Operation): void => {
         this.setState(prev => ({
-            accumulator: 0,
-            operand: prev.accumulator,
-            operation
+            current: '',
+            stack: [...prev.stack, Number(prev.current), operation]
         }))
     }
 }
