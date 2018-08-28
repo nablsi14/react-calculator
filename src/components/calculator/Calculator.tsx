@@ -7,6 +7,7 @@ import { Operation, Parenthesis } from './Operations'
 import OutputDisplay from './OutputDisplay'
 import StyledButton from './StyledButton'
 
+type PostfixStack = Array<number | Operation>
 const styles = () =>
     createStyles({
         calculatorContainer: {
@@ -187,9 +188,7 @@ class CalculatorBase extends PureComponent<
         }
     }
 
-    private readonly evalPostfix = (
-        postfixStack: Array<number | Operation>
-    ): number => {
+    private readonly evalPostfix = (postfixStack: PostfixStack): number => {
         const tempStack: number[] = []
         for (const item of postfixStack) {
             if (typeof item === 'number') {
@@ -209,8 +208,8 @@ class CalculatorBase extends PureComponent<
 
     private readonly infixToPostfix = (
         input: Array<number | Operation | Parenthesis>
-    ): Array<number | Operation> => {
-        const result: Array<number | Operation> = []
+    ): PostfixStack => {
+        const result: PostfixStack = []
         const operators: Array<Operation | Parenthesis> = []
 
         for (const item of input) {
