@@ -11,7 +11,10 @@
             "url": "http://localhost:3000",
             "linux": {
                 "runtimeExecutable": "/usr/bin/chromium",
-                "runtimeArgs": ["----remote-debugging-port=9222"]
+                "runtimeArgs": [
+                    "----remote-debugging-port=9222",
+                    "--user-data-dir=/tmp"
+                ]
             },
             "webRoot": "${workspaceFolder}/src",
             "sourceMapPathOverrides": {
