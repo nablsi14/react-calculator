@@ -65,9 +65,8 @@ class CalculatorBase extends PureComponent<
                         spacing={8}
                     >
                         {this.props.operations.map(op => (
-                            <Grid item={true}>
+                            <Grid item={true} key={op.text}>
                                 <OpertionButton
-                                    key={op.text}
                                     operation={op}
                                     onClick={this.handleOperationClick}
                                 />
