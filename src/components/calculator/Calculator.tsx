@@ -33,6 +33,15 @@ class CalculatorBase extends PureComponent<
         stack: []
     }
 
+    public componentDidMount(): void {
+        // setup key bindings
+        window.addEventListener('keydown', this.handleKeyPress)
+    }
+
+    public componentWillUnmount(): void {
+        window.removeEventListener('keydown', this.handleKeyPress)
+    }
+
     public render(): React.ReactNode {
         const { classes } = this.props
         return (
@@ -97,7 +106,7 @@ class CalculatorBase extends PureComponent<
                             <Grid item={true} key={op.text}>
                                 <OpertionButton
                                     operation={op}
-                                    onClick={this.handleOperationClick}
+                                    onClick={this.handleOperation}
                                 />
                             </Grid>
                         ))}
@@ -267,14 +276,46 @@ class CalculatorBase extends PureComponent<
             }
         })
     }
+    private readonly handleKeyPress = (event: KeyboardEvent): void => {
+        const { key } = event
+        const customShortcutIsPressed = (
+            e: KeyboardEvent,
+            op: Operation
+        ): boolean =>
+            op.shortcut !== undefined &&
+            op.shortcut.alt === e.altKey &&
+            op.shortcut.ctrl === e.ctrlKey &&
+            op.shortcut.key === e.key
 
+        if (key !== 'Control' && key !== 'Alt' && key !== 'Shift') {
+            if (/\d/g.test(key)) {
+                this.handleNumberInput(Number(key))
+            } else if (key === '.') {
+                this.setDecimalPoint()
+            } else if (key === 'Escape') {
+                this.clear()
+            } else if (key === 'Backspace') {
+                this.clearLast()
+            } else if (key === '=' || key === 'Enter') {
+                event.preventDefault()
+                this.evaluate()
+            } else {
+                for (const op of this.props.operations) {
+                    if (customShortcutIsPressed(event, op)) {
+                        this.handleOperation(op)
+                        break
+                    }
+                }
+            }
+        }
+    }
     private readonly handleNumberInput = (input: number): void => {
         this.setState(prev => ({
             current: prev.current + String(input)
         }))
     }
 
-    private readonly handleOperationClick = (operation: Operation): void => {
+    private readonly handleOperation = (operation: Operation): void => {
         this.setState(prev => ({
             current: '',
             stack: [...prev.stack, Number(prev.current), operation]
