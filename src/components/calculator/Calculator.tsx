@@ -53,7 +53,10 @@ class CalculatorBase extends PureComponent<
                     spacing={8}
                 >
                     <Grid item={true} xs={12}>
-                        <OutputDisplay value={Number(this.state.current)} />
+                        <OutputDisplay
+                            evalStack={this.state.stack}
+                            value={this.state.current}
+                        />
                     </Grid>
                     {/* buttons will be added here later */}
                     {/* <Grid item={true} xs={12} /> */}
