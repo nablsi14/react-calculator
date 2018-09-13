@@ -8,6 +8,7 @@ import {
     withStyles
 } from '@material-ui/core'
 import React from 'react'
+import { EvalStack } from './Operations'
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -22,7 +23,8 @@ const styles = (theme: Theme) =>
     })
 
 interface Props {
-    value: number
+    evalStack: EvalStack
+    value: string
 }
 
 const OutputDisplayBase = (props: Props & WithStyles<typeof styles>) => {
@@ -35,7 +37,20 @@ const OutputDisplayBase = (props: Props & WithStyles<typeof styles>) => {
             >
                 <Grid item={true} xs={12}>
                     <Typography variant="title" align="right">
-                        {props.value}
+                        {props.evalStack
+                            .map(
+                                i =>
+                                    typeof i === 'number' ||
+                                    i === '(' ||
+                                    i === ')'
+                                        ? i
+                                        : i.text
+                            )
+                            .join(' ') +
+                            ' ' +
+                            (props.value === '' && props.evalStack.length === 0
+                                ? '0'
+                                : props.value)}
                     </Typography>
                 </Grid>
             </Grid>
