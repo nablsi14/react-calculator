@@ -17,11 +17,18 @@ const styles = () =>
             fontSize: '2em'
         }
     })
+interface FinishedExpression {
+    expression: EvalStack
+    result: number
+}
 interface Props {
     operations: Operation[]
 }
 interface State {
     readonly current: string
+    readonly evaluated: boolean
+    readonly history: FinishedExpression[]
+    readonly result: number | null
     readonly stack: EvalStack
 }
 
@@ -31,6 +38,9 @@ class CalculatorBase extends PureComponent<
 > {
     public readonly state: State = {
         current: '',
+        evaluated: false,
+        history: [],
+        result: null,
         stack: []
     }
 
@@ -54,7 +64,8 @@ class CalculatorBase extends PureComponent<
                 >
                     <Grid item={true} xs={12}>
                         <OutputDisplay
-                            evalStack={this.state.stack}
+                            expression={this.state.stack}
+                            result={this.state.result}
                             value={this.state.current}
                         />
                     </Grid>
@@ -128,6 +139,8 @@ class CalculatorBase extends PureComponent<
     private readonly clear = (): void => {
         this.setState({
             current: '',
+            evaluated: false,
+            result: null,
             stack: []
         })
     }
@@ -172,16 +185,20 @@ class CalculatorBase extends PureComponent<
     }
 
     private readonly evaluate = (): void => {
+        if (this.state.evaluated || this.state.stack.length === 0) {
+            return
+        }
         try {
-            const postfixStack = this.infixToPostfix([
-                ...this.state.stack,
-                Number(this.state.current)
-            ])
+            const toEval = [...this.state.stack, Number(this.state.current)]
+            const postfixStack = this.infixToPostfix(toEval)
             const result = this.evalPostfix(postfixStack)
-            this.setState({
+            this.setState(prev => ({
                 current: String(result),
-                stack: []
-            })
+                evaluated: true,
+                history: [...prev.history, { expression: toEval, result }],
+                result,
+                stack: [...prev.stack, parseInt(prev.current, 10)]
+            }))
         } catch (e) {
             // the stack was invalid
             // this is most likely caused by the user pressing the "=" button before finishing the expression
@@ -311,14 +328,24 @@ class CalculatorBase extends PureComponent<
     }
     private readonly handleNumberInput = (input: number): void => {
         this.setState(prev => ({
-            current: prev.current + String(input)
+            current: prev.evaluated
+                ? String(input)
+                : prev.current + String(input),
+            evaluated: false,
+            result: null,
+            stack: prev.evaluated ? [] : prev.stack
         }))
     }
 
     private readonly handleOperation = (operation: Operation): void => {
         this.setState(prev => ({
             current: '',
-            stack: [...prev.stack, Number(prev.current), operation]
+            evaluated: false,
+            result: null,
+            stack:
+                prev.evaluated && prev.result !== null
+                    ? [prev.result, operation]
+                    : [...prev.stack, Number(prev.current), operation]
         }))
     }
 }

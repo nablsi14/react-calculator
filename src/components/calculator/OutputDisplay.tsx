@@ -8,7 +8,7 @@ import {
     withStyles
 } from '@material-ui/core'
 import React from 'react'
-import { EvalStack } from './Operations'
+import { EvalStack, stringifyEvalStack } from './Operations'
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -23,11 +23,17 @@ const styles = (theme: Theme) =>
     })
 
 interface Props {
-    evalStack: EvalStack
+    expression: EvalStack
+    result: number | null
     value: string
 }
 
 const OutputDisplayBase = (props: Props & WithStyles<typeof styles>) => {
+    const expression: string =
+        props.expression.length === 0 && props.value === ''
+            ? '0'
+            : stringifyEvalStack(props.expression) + ' ' + props.value
+
     return (
         <Paper className={props.classes.display}>
             <Grid
@@ -36,26 +42,19 @@ const OutputDisplayBase = (props: Props & WithStyles<typeof styles>) => {
                 className={props.classes.grid}
             >
                 <Grid item={true} xs={12}>
+                    {props.result !== null && (
+                        <Typography variant="subheading" align="right">
+                            {stringifyEvalStack(props.expression)}
+                        </Typography>
+                    )}{' '}
                     <Typography variant="title" align="right">
-                        {props.evalStack
-                            .map(
-                                i =>
-                                    typeof i === 'number' ||
-                                    i === '(' ||
-                                    i === ')'
-                                        ? i
-                                        : i.text
-                            )
-                            .join(' ') +
-                            ' ' +
-                            (props.value === '' && props.evalStack.length === 0
-                                ? '0'
-                                : props.value)}
+                        {props.result === null ? expression : props.result}
                     </Typography>
                 </Grid>
             </Grid>
         </Paper>
     )
 }
+
 const OutputDisplay = withStyles(styles)(OutputDisplayBase)
 export default OutputDisplay

@@ -3,6 +3,15 @@ export type Parenthesis = '(' | ')'
 export type EvalFunc = (left: number, right: number) => number
 
 export type EvalStack = Array<number | Operation | Parenthesis>
+
+export function stringifyEvalStack(stack: EvalStack): string {
+    return stack
+        .map(
+            i => (typeof i === 'number' || i === '(' || i === ')' ? i : i.text)
+        )
+        .join(' ')
+}
+
 interface KeyboardShortcut {
     alt: boolean
     ctrl: boolean
