@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { Operation } from './Operations'
-import StyledButton from './StyledButton'
+import StyledButton from 'src/components/StyledButton'
+import { Operation } from '../util/operations'
 
 interface Props {
     operation: Operation

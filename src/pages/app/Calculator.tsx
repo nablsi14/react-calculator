@@ -1,11 +1,11 @@
 import { createStyles, Grid, WithStyles, withStyles } from '@material-ui/core'
 import BackspaceOutlined from '@material-ui/icons/BackspaceOutlined'
 import React, { PureComponent } from 'react'
-import NumberButton from './InputButton'
-import OpertionButton from './OperationButton'
-import { EvalStack, Operation, Parenthesis } from './Operations'
-import OutputDisplay from './OutputDisplay'
-import StyledButton from './StyledButton'
+import NumberButton from 'src/components/InputButton'
+import OpertionButton from 'src/components/OperationButton'
+import StyledButton from 'src/components/StyledButton'
+import OutputDisplay from 'src/pages/app/calculator/OutputDisplay'
+import { EvalStack, Operation, Parenthesis } from 'src/util/operations'
 
 type PostfixStack = Array<number | Operation>
 const styles = () =>

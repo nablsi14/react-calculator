@@ -8,7 +8,7 @@ import {
     withStyles
 } from '@material-ui/core'
 import React from 'react'
-import { EvalStack, stringifyEvalStack } from './Operations'
+import { EvalStack, stringifyEvalStack } from '../../../util/operations'
 
 const styles = (theme: Theme) =>
     createStyles({

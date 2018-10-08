@@ -10,8 +10,8 @@ import {
     WithStyles
 } from '@material-ui/core'
 import React, { Fragment } from 'react'
-import Calculator from './calculator/Calculator'
-import { standard } from './calculator/Operations'
+import Calculator from 'src/pages/app/Calculator'
+import { standard } from 'src/util/operations'
 
 const styles = (theme: Theme) =>
     createStyles({
