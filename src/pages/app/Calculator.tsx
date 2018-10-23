@@ -1,9 +1,13 @@
 import { createStyles, Grid, WithStyles, withStyles } from '@material-ui/core'
 import BackspaceOutlined from '@material-ui/icons/BackspaceOutlined'
 import React, { PureComponent } from 'react'
-import NumberButton from 'src/components/InputButton'
-import OpertionButton from 'src/components/OperationButton'
-import StyledButton from 'src/components/StyledButton'
+import {
+    GridWithNumberButton,
+    GridWithOperationButton,
+    GridWithStyledButton
+} from 'src/components/GridButton'
+// import OpertionButton from 'src/components/OperationButton'
+// import StyledButton from 'src/components/StyledButton'
 import OutputDisplay from 'src/pages/app/calculator/OutputDisplay'
 import { EvalStack, Operation, Parenthesis } from 'src/util/operations'
 
@@ -78,37 +82,30 @@ class CalculatorBase extends PureComponent<
                         container={true}
                         spacing={8}
                     >
-                        <Grid item={true} xs={4}>
-                            <StyledButton onClick={this.clearEntry}>
-                                CE
-                            </StyledButton>
-                        </Grid>
-                        <Grid item={true} xs={4}>
-                            <StyledButton onClick={this.clear}>C</StyledButton>
-                        </Grid>
-                        <Grid item={true} xs={4}>
-                            <StyledButton onClick={this.clearLast}>
-                                <BackspaceOutlined />
-                            </StyledButton>
-                        </Grid>
-                        {...this.createNumberButtons()}
-                        <Grid item={true} xs={4}>
-                            <StyledButton onClick={this.toggleSign}>
-                                ± {/*  UTF-8 code: U+00B1  */}
-                            </StyledButton>
-                        </Grid>
+                        <GridWithStyledButton onClick={this.clearEntry}>
+                            CE
+                        </GridWithStyledButton>
 
-                        <Grid item={true} xs={4}>
-                            <NumberButton
-                                onClick={this.handleNumberInput}
-                                value={0}
-                            />
-                        </Grid>
-                        <Grid item={true} xs={4}>
-                            <StyledButton onClick={this.setDecimalPoint}>
-                                <span className={classes.decimalButton}>.</span>
-                            </StyledButton>
-                        </Grid>
+                        <GridWithStyledButton onClick={this.clear}>
+                            C
+                        </GridWithStyledButton>
+
+                        <GridWithStyledButton onClick={this.clearLast}>
+                            <BackspaceOutlined />
+                        </GridWithStyledButton>
+
+                        {...this.createNumberButtons()}
+                        <GridWithStyledButton onClick={this.toggleSign}>
+                            ± {/*  UTF-8 code: U+00B1  */}
+                        </GridWithStyledButton>
+
+                        <GridWithNumberButton
+                            onClick={this.handleNumberInput}
+                            value={0}
+                        />
+                        <GridWithStyledButton onClick={this.setDecimalPoint}>
+                            <span className={classes.decimalButton}>.</span>
+                        </GridWithStyledButton>
                     </Grid>
                     <Grid
                         item={true}
@@ -118,18 +115,15 @@ class CalculatorBase extends PureComponent<
                         spacing={8}
                     >
                         {this.props.operations.map(op => (
-                            <Grid item={true} key={op.text}>
-                                <OpertionButton
-                                    operation={op}
-                                    onClick={this.handleOperation}
-                                />
-                            </Grid>
+                            <GridWithOperationButton
+                                xs="auto"
+                                operation={op}
+                                onClick={this.handleOperation}
+                            />
                         ))}
-                        <Grid item={true}>
-                            <StyledButton onClick={this.evaluate}>
-                                =
-                            </StyledButton>
-                        </Grid>
+                        <GridWithStyledButton xs="auto" onClick={this.evaluate}>
+                            =
+                        </GridWithStyledButton>
                     </Grid>
                 </Grid>
             </div>
@@ -175,9 +169,11 @@ class CalculatorBase extends PureComponent<
 
         for (let i = 9; i > 0; i--) {
             result.push(
-                <Grid item={true} xs={4} key={i}>
-                    <NumberButton onClick={this.handleNumberInput} value={i} />
-                </Grid>
+                <GridWithNumberButton
+                    key={i}
+                    onClick={this.handleNumberInput}
+                    value={i}
+                />
             )
         }
 
