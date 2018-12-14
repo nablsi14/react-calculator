@@ -114,11 +114,12 @@ class CalculatorBase extends PureComponent<
                         container={true}
                         spacing={8}
                     >
-                        {this.props.operations.map(op => (
+                        {this.props.operations.map((op, i) => (
                             <GridWithOperationButton
                                 xs="auto"
                                 operation={op}
                                 onClick={this.handleOperation}
+                                key={i}
                             />
                         ))}
                         <GridWithStyledButton xs="auto" onClick={this.evaluate}>
@@ -149,7 +150,7 @@ class CalculatorBase extends PureComponent<
         // the last thing to have been clicked was an operation
         if (this.state.current === '') {
             this.setState(prev => ({
-                // set curret to be the last number that was inputed
+                // set current to be the last number that was inputted
                 current: String(prev.stack[prev.stack.length - 2]),
                 // remove the last 2 items from the stack
                 stack: prev.stack.slice(0, prev.stack.length - 2)
@@ -193,7 +194,7 @@ class CalculatorBase extends PureComponent<
                 evaluated: true,
                 history: [...prev.history, { expression: toEval, result }],
                 result,
-                stack: [...prev.stack, parseInt(prev.current, 10)]
+                stack: [...prev.stack, parseFloat(prev.current)]
             }))
         } catch (e) {
             // the stack was invalid
