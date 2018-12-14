@@ -6,8 +6,6 @@ import {
     GridWithOperationButton,
     GridWithStyledButton
 } from 'src/components/GridButton'
-// import OpertionButton from 'src/components/OperationButton'
-// import StyledButton from 'src/components/StyledButton'
 import OutputDisplay from 'src/pages/app/calculator/OutputDisplay'
 import { EvalStack, Operation, Parenthesis } from 'src/util/operations'
 
