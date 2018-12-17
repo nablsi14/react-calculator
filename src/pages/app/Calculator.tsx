@@ -191,7 +191,7 @@ class CalculatorBase extends PureComponent<
         if (this.state.current === '') {
             this.setState(prev => ({
                 // set current to be the last number that was inputted
-                current: String(prev.stack[prev.stack.length - 2]),
+                current: String(prev.stack[prev.stack.length - 2] || ''),
                 // remove the last 2 items from the stack
                 stack: prev.stack.slice(0, prev.stack.length - 2)
             }))
