@@ -10,7 +10,9 @@ import {
 
 const styles = (theme: Theme) =>
     createStyles({
-        button: {}
+        button: {
+            maxHeight: '36px'
+        }
     })
 interface Props {
     children: any
