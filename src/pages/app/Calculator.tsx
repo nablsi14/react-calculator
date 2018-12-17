@@ -125,10 +125,52 @@ class CalculatorBase extends PureComponent<
                         </GridWithStyledButton>
                     </Grid>
                 </Grid>
+                <Grid item={true} direction="row" container={true} spacing={8}>
+                    <GridWithStyledButton xs="auto" onClick={this.openParen}>
+                        (
+                    </GridWithStyledButton>
+                    <GridWithStyledButton xs="auto" onClick={this.closeParen}>
+                        )
+                    </GridWithStyledButton>
+                </Grid>
             </div>
         )
     }
-
+    private readonly openParen = (): void => {
+        if (this.state.evaluated) {
+            return
+        }
+        this.setState(({ stack }) => {
+            const last = stack[stack.length - 1]
+            if (typeof last === 'number') {
+                return {
+                    stack: [...stack.slice(0, stack.length - 2), '(', last]
+                }
+            }
+            return {
+                stack: [...stack, '(']
+            }
+        })
+    }
+    private readonly closeParen = (): void => {
+        if (this.state.evaluated) {
+            return
+        }
+        this.setState(({ current, stack }) => {
+            const last = stack[stack.length - 1]
+            if (current !== '' || last === ')' || last === '(') {
+                return {
+                    current: '',
+                    stack: [...stack, parseFloat(current), ')']
+                }
+            }
+            // last is an operation
+            return {
+                current,
+                stack: [...stack.slice(0, stack.length - 1), ')']
+            }
+        })
+    }
     private readonly clear = (): void => {
         this.setState({
             current: '',
@@ -184,7 +226,10 @@ class CalculatorBase extends PureComponent<
             return
         }
         try {
-            const toEval = [...this.state.stack, Number(this.state.current)]
+            const toEval =
+                this.state.current !== ''
+                    ? [...this.state.stack, Number(this.state.current)]
+                    : this.state.stack
             const postfixStack = this.infixToPostfix(toEval)
             const result = this.evalPostfix(postfixStack)
             this.setState(prev => ({
@@ -192,7 +237,10 @@ class CalculatorBase extends PureComponent<
                 evaluated: true,
                 history: [...prev.history, { expression: toEval, result }],
                 result,
-                stack: [...prev.stack, parseFloat(prev.current)]
+                stack:
+                    prev.current !== ''
+                        ? [...prev.stack, parseFloat(prev.current)]
+                        : prev.stack
             }))
         } catch (e) {
             // the stack was invalid
@@ -233,7 +281,7 @@ class CalculatorBase extends PureComponent<
             } else if (item === ')') {
                 while (
                     operators.length !== 0 &&
-                    operators[operators.length - 1] !== ')'
+                    operators[operators.length - 1] !== '('
                 ) {
                     result.push(operators.pop() as Operation)
                 }
@@ -311,6 +359,10 @@ class CalculatorBase extends PureComponent<
             } else if (key === '=' || key === 'Enter') {
                 event.preventDefault()
                 this.evaluate()
+            } else if (key === '(') {
+                this.openParen()
+            } else if (key === ')') {
+                this.closeParen()
             } else {
                 for (const op of this.props.operations) {
                     if (customShortcutIsPressed(event, op)) {
@@ -340,7 +392,9 @@ class CalculatorBase extends PureComponent<
             stack:
                 prev.evaluated && prev.result !== null
                     ? [prev.result, operation]
-                    : [...prev.stack, Number(prev.current), operation]
+                    : prev.current === ''
+                        ? [...prev.stack, operation]
+                        : [...prev.stack, Number(prev.current), operation]
         }))
     }
 }
